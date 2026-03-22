@@ -7,6 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/davidshimjs-qrcodejs@0.0.2/qrcode.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -117,8 +118,21 @@ h3{font-size:1.1rem;font-weight:700;margin-bottom:12px;color:var(--accent)}
 /* Charts */
 .charts-row{display:flex;gap:20px;width:100%;flex-wrap:wrap;margin-top:20px}
 .chart-box{flex:1;min-width:280px}
-.chart-box canvas{max-height:320px}
+.chart-box canvas{max-height:380px}
 .chart-box h3{text-align:center}
+/* Legend grid */
+.legend-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px 10px;margin-top:14px;font-size:.78rem}
+.legend-item{display:flex;align-items:center;gap:5px;white-space:nowrap}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.legend-label{color:var(--text2)}
+.legend-pct{color:var(--text);font-weight:600;margin-left:auto}
+.legend-item.highlight .legend-label{color:var(--accent);font-weight:700}
+.legend-item.highlight .legend-pct{color:var(--accent)}
+/* QR */
+.qr-wrap{display:flex;flex-direction:column;align-items:center;margin-bottom:16px}
+.qr-card{background:#fff;padding:16px;border-radius:14px;display:inline-block}
+.qr-label{font-size:.9rem;color:var(--text2);margin-bottom:10px;text-align:center}
+@media(max-width:600px){.legend-grid{grid-template-columns:repeat(2,1fr)}}
 /* Admin */
 .switch-wrap{display:flex;align-items:center;gap:14px;margin-bottom:20px}
 .switch{
@@ -242,8 +256,8 @@ td{padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.05)}
     <div class="type-desc" id="result-desc"></div>
   </div>
   <div class="charts-row" id="result-charts">
-    <div class="chart-box card"><h3>🌍 全球分佈</h3><canvas id="chart-global"></canvas></div>
-    <div class="chart-box card"><h3>🏫 班級分佈</h3><canvas id="chart-class"></canvas></div>
+    <div class="chart-box card"><h3>🌍 全球分佈</h3><canvas id="chart-global"></canvas><div class="legend-grid" id="legend-global"></div></div>
+    <div class="chart-box card"><h3>🏫 班級分佈</h3><canvas id="chart-class"></canvas><div class="legend-grid" id="legend-class"></div></div>
   </div>
   <div style="text-align:center;margin-top:20px">
     <button class="btn btn-secondary" onclick="showScreen('welcome')">← 返回首頁</button>
@@ -302,6 +316,10 @@ td{padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.05)}
   <div class="card" style="margin-bottom:20px">
     <h3>🔗 分享連結</h3>
     <p style="font-size:.85rem;color:var(--text2);margin-bottom:10px">將此連結分享給學生，讓他們進入測試頁面</p>
+    <div class="qr-wrap">
+      <div class="qr-label">掃描 QR Code 進入測試</div>
+      <div class="qr-card"><div id="qrcode"></div></div>
+    </div>
     <div class="share-box">
       <input type="text" id="share-url" readonly>
       <button class="btn btn-sm btn-primary" onclick="copyShareLink()">📋 複製</button>
@@ -310,8 +328,8 @@ td{padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.05)}
   </div>
   <!-- Charts -->
   <div class="charts-row" style="margin-bottom:20px">
-    <div class="chart-box card"><h3>🌍 全球 MBTI 分佈</h3><canvas id="admin-chart-global"></canvas></div>
-    <div class="chart-box card"><h3>🏫 班級 MBTI 分佈</h3><canvas id="admin-chart-class"></canvas></div>
+    <div class="chart-box card"><h3>🌍 全球 MBTI 分佈</h3><canvas id="admin-chart-global"></canvas><div class="legend-grid" id="admin-legend-global"></div></div>
+    <div class="chart-box card"><h3>🏫 班級 MBTI 分佈</h3><canvas id="admin-chart-class"></canvas><div class="legend-grid" id="admin-legend-class"></div></div>
   </div>
   <!-- Table -->
   <div class="card">
@@ -585,14 +603,17 @@ function renderResultCharts(myType, classResults) {
   if (resultChartGlobal) resultChartGlobal.destroy();
   if (resultChartClass) resultChartClass.destroy();
 
-  resultChartGlobal = createPieChart('chart-global', MBTI_TYPES.map(t => GLOBAL_PCT[t]), MBTI_TYPES, myType, '全球分佈');
+  const globalData = MBTI_TYPES.map(t => GLOBAL_PCT[t]);
+  resultChartGlobal = createPieChart('chart-global', globalData, MBTI_TYPES, myType, false);
+  buildLegend('legend-global', MBTI_TYPES, globalData, myType);
 
   const classCounts = {};
   MBTI_TYPES.forEach(t => classCounts[t] = 0);
   classResults.forEach(r => { if (classCounts[r.mbti_type] !== undefined) classCounts[r.mbti_type]++; });
   const total = classResults.length || 1;
   const classPct = MBTI_TYPES.map(t => Math.round(classCounts[t] / total * 1000) / 10);
-  resultChartClass = createPieChart('chart-class', classPct, MBTI_TYPES, myType, '班級分佈');
+  resultChartClass = createPieChart('chart-class', classPct, MBTI_TYPES, myType, true);
+  buildLegend('legend-class', MBTI_TYPES, classPct, myType);
 }
 
 /* ==================== ADMIN ==================== */
@@ -662,14 +683,17 @@ function renderAdminCharts(completed) {
   if (adminChartGlobal) adminChartGlobal.destroy();
   if (adminChartClass) adminChartClass.destroy();
 
-  adminChartGlobal = createPieChart('admin-chart-global', MBTI_TYPES.map(t => GLOBAL_PCT[t]), MBTI_TYPES, null, '全球分佈');
+  const globalData = MBTI_TYPES.map(t => GLOBAL_PCT[t]);
+  adminChartGlobal = createPieChart('admin-chart-global', globalData, MBTI_TYPES, null, false);
+  buildLegend('admin-legend-global', MBTI_TYPES, globalData, null);
 
   const classCounts = {};
   MBTI_TYPES.forEach(t => classCounts[t] = 0);
   completed.forEach(s => { if (classCounts[s.mbti_type] !== undefined) classCounts[s.mbti_type]++; });
   const total = completed.length || 1;
   const classPct = MBTI_TYPES.map(t => Math.round(classCounts[t] / total * 1000) / 10);
-  adminChartClass = createPieChart('admin-chart-class', classPct, MBTI_TYPES, null, '班級分佈');
+  adminChartClass = createPieChart('admin-chart-class', classPct, MBTI_TYPES, null, true);
+  buildLegend('admin-legend-class', MBTI_TYPES, classPct, null);
 }
 
 async function toggleTest() {
@@ -690,14 +714,17 @@ function exportCSV() {
 }
 
 async function loadShareLink() {
+  let url = window.location.origin;
   try {
     const r = await fetch('/api/server-info');
     const d = await r.json();
-    if (d.success) document.getElementById('share-url').value = d.url;
-    else document.getElementById('share-url').value = window.location.origin;
-  } catch(e) {
-    document.getElementById('share-url').value = window.location.origin;
-  }
+    if (d.success) url = d.url;
+  } catch(e) {}
+  document.getElementById('share-url').value = url;
+  // Generate QR code
+  const qrEl = document.getElementById('qrcode');
+  qrEl.innerHTML = '';
+  new QRCode(qrEl, { text: url, width: 256, height: 256, colorDark: '#1a0a2e', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M });
 }
 
 function copyShareLink() {
@@ -713,11 +740,13 @@ function copyShareLink() {
 }
 
 /* ==================== PIE CHART ==================== */
-function createPieChart(canvasId, dataValues, labels, highlightType, title) {
+// showLabels: true = show datalabels on slices (for class charts with fewer types)
+//             false = no inline labels (for global charts — use legend instead)
+function createPieChart(canvasId, dataValues, labels, highlightType, showLabels) {
   const ctx = document.getElementById(canvasId).getContext('2d');
   const colors = labels.map(t => TYPE_COLORS[t] || '#888');
   const bgColors = colors.map((c, i) => {
-    const alpha = dataValues[i] > 0 ? 0.8 : 0.2;
+    const alpha = dataValues[i] > 0 ? 0.8 : 0.15;
     return hexToRGBA(c, alpha);
   });
   const borderColors = colors.map((c, i) => {
@@ -725,6 +754,16 @@ function createPieChart(canvasId, dataValues, labels, highlightType, title) {
   });
   const offsets = labels.map(t => t === highlightType ? 18 : 0);
   const borderWidths = labels.map(t => t === highlightType ? 3 : 1);
+
+  const dlConfig = showLabels ? {
+    color: '#fff',
+    font: { weight: 'bold', size: 11, family: 'Noto Sans TC' },
+    formatter: function(value, ctx) {
+      if (value < 3) return '';
+      return ctx.chart.data.labels[ctx.dataIndex] + '\n' + value + '%';
+    },
+    textAlign: 'center'
+  } : { display: false };
 
   return new Chart(ctx, {
     type: 'pie',
@@ -742,7 +781,7 @@ function createPieChart(canvasId, dataValues, labels, highlightType, title) {
     options: {
       responsive: true,
       maintainAspectRatio: true,
-      layout: { padding: 10 },
+      layout: { padding: 6 },
       plugins: {
         legend: { display: false },
         tooltip: {
@@ -752,17 +791,24 @@ function createPieChart(canvasId, dataValues, labels, highlightType, title) {
             }
           }
         },
-        datalabels: {
-          color: '#fff',
-          font: { weight: 'bold', size: 11, family: 'Noto Sans TC' },
-          formatter: function(value, ctx) {
-            if (value < 3) return '';
-            return ctx.chart.data.labels[ctx.dataIndex] + '\n' + value + '%';
-          },
-          textAlign: 'center'
-        }
+        datalabels: dlConfig
       }
     }
+  });
+}
+
+function buildLegend(containerId, labels, dataValues, highlightType) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = '';
+  labels.forEach((t, i) => {
+    const isHl = t === highlightType;
+    const item = document.createElement('div');
+    item.className = 'legend-item' + (isHl ? ' highlight' : '');
+    item.innerHTML = '<span class="legend-dot" style="background:' + (TYPE_COLORS[t] || '#888') + '"></span>' +
+      '<span class="legend-label">' + t + '</span>' +
+      '<span class="legend-pct">' + dataValues[i] + '%</span>';
+    el.appendChild(item);
   });
 }
 
