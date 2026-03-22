@@ -18,41 +18,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 // ==================== JSON File Storage ====================
 
 function getDefaultData() {
-  const mockStudents = [
-    { name: '陳美玲', type: 'ENFP' },
-    { name: '林志偉', type: 'ISTJ' },
-    { name: '王雅琴', type: 'INFJ' },
-    { name: '張家豪', type: 'ESTP' },
-    { name: '李佳穎', type: 'ISFJ' },
-    { name: '黃俊傑', type: 'ENTJ' },
-    { name: '吳雅文', type: 'INFP' },
-    { name: '劉建宏', type: 'ESTJ' },
-    { name: '蔡欣怡', type: 'ESFJ' },
-    { name: '許志明', type: 'INTP' },
-    { name: '鄭雅婷', type: 'ENFJ' },
-    { name: '謝宗翰', type: 'ISTP' },
-    { name: '周怡君', type: 'ESFP' },
-    { name: '楊承恩', type: 'INTJ' },
-    { name: '洪美惠', type: 'ISFP' },
-    { name: '蕭志豪', type: 'ENTP' },
-    { name: '盧雅芳', type: 'ISTJ' },
-    { name: '傅俊宇', type: 'ESFJ' },
-    { name: '曾佩珊', type: 'ENFP' },
-    { name: '賴冠廷', type: 'ISFJ' }
-  ];
-
-  const students = mockStudents.map((s, i) => ({
-    id: i + 1,
-    name: s.name,
-    password: s.name,
-    mbti_type: s.type,
-    answers: null,
-    completed_at: new Date(Date.now() - Math.floor(Math.random() * 7 * 24 * 60 * 60 * 1000)).toISOString()
-  }));
-
   return {
-    nextId: students.length + 1,
-    students,
+    nextId: 1,
+    students: [],
     settings: { test_open: false },
     admin: { username: 'admin', password: 'admin123' }
   };
@@ -65,12 +33,12 @@ function loadData() {
       return JSON.parse(raw);
     }
   } catch (e) {
-    console.error('⚠️ 讀取資料檔案失敗，將重新建立:', e.message);
+    console.error('â ï¸ è®åè³ææªæ¡å¤±æï¼å°éæ°å»ºç«:', e.message);
   }
-  // First run or corrupt file — create fresh data
+  // First run or corrupt file â create fresh data
   const data = getDefaultData();
   saveData(data);
-  console.log('✅ 已建立 20 位模擬學生資料');
+  console.log('â å·²å»ºç«åå§ç©ºç½è³æ');
   return data;
 }
 
@@ -89,11 +57,11 @@ app.post('/api/login', (req, res) => {
 
   // Check master switch
   if (!data.settings.test_open) {
-    return res.json({ success: false, message: '測試尚未開放，請等待老師開啟測試。' });
+    return res.json({ success: false, message: 'æ¸¬è©¦å°æªéæ¾ï¼è«ç­å¾èå¸«éåæ¸¬è©¦ã' });
   }
 
   if (!name || !password) {
-    return res.json({ success: false, message: '請輸入姓名和密碼' });
+    return res.json({ success: false, message: 'è«è¼¸å¥å§ååå¯ç¢¸' });
   }
 
   // Find or create student
@@ -114,7 +82,7 @@ app.post('/api/login', (req, res) => {
   }
 
   if (student.password !== password) {
-    return res.json({ success: false, message: '密碼錯誤' });
+    return res.json({ success: false, message: 'å¯ç¢¼é¯èª¤' });
   }
 
   if (student.mbti_type) {
@@ -140,16 +108,16 @@ app.post('/api/submit', (req, res) => {
   const { studentId, answers, mbtiType } = req.body;
 
   if (!studentId || !mbtiType) {
-    return res.json({ success: false, message: '缺少必要資料' });
+    return res.json({ success: false, message: 'ç¼ºå°å¿è¦è³æ' });
   }
 
   const student = data.students.find(s => s.id === studentId);
   if (!student) {
-    return res.json({ success: false, message: '找不到學生' });
+    return res.json({ success: false, message: 'æ¾ä¸å°å­¸ç' });
   }
 
   if (student.mbti_type) {
-    return res.json({ success: false, message: '你已經完成測試了' });
+    return res.json({ success: false, message: 'ä½ å·²ç¶å®ææ¸¬è©¦äº' });
   }
 
   student.mbti_type = mbtiType;
@@ -173,7 +141,7 @@ app.post('/api/admin/login', (req, res) => {
   const { username, password } = req.body;
 
   if (username !== data.admin.username || password !== data.admin.password) {
-    return res.json({ success: false, message: '帳號或密碼錯誤' });
+    return res.json({ success: false, message: 'å¸³èæå¯ç¢¼é¯èª¤' });
   }
 
   return res.json({ success: true });
@@ -212,7 +180,7 @@ app.get('/api/admin/export', (req, res) => {
     .sort((a, b) => new Date(b.completed_at) - new Date(a.completed_at));
 
   const BOM = '\uFEFF';
-  let csv = BOM + '姓名,MBTI類型,完成時間\n';
+  let csv = BOM + 'å§å,MBTIé¡å,å®ææé\n';
   for (const s of completed) {
     const time = s.completed_at ? new Date(s.completed_at).toLocaleString('zh-TW') : '';
     csv += `${s.name},${s.mbti_type},${time}\n`;
@@ -235,8 +203,8 @@ app.get('/api/server-info', (req, res) => {
 // Start server
 app.listen(PORT, () => {
   console.log('');
-  console.log('🧠 MBTI 性格測試系統已啟動！');
-  console.log(`   監聽埠號: ${PORT}`);
-  console.log('   管理員帳號: admin / admin123');
+  console.log('ð§  MBTI æ§æ ¼æ¸¬è©¦ç³»çµ±å·²ååï¼');
+  console.log(`   ç£è½å è: ${PORT}`);
+  console.log('   ç®¡çå¡å¸³è: admin / admin123');
   console.log('');
 });
