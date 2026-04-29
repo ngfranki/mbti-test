@@ -114,7 +114,24 @@ h3{font-size:1.1rem;font-weight:700;margin-bottom:12px;color:var(--accent)}
   box-shadow:0 6px 30px rgba(167,139,250,.4);
 }
 .type-title{font-size:1.2rem;font-weight:700;color:var(--accent2);margin-bottom:10px}
-.type-desc{font-size:.95rem;color:var(--text2);line-height:1.8;max-width:500px;margin:0 auto}
+.type-desc{font-size:.95rem;color:var(--text2);line-height:1.8;max-width:540px;margin:0 auto}
+/* Fragrance recommendation box */
+.fragrance-box{
+  margin:28px auto 0;max-width:480px;padding:22px 28px;
+  background:linear-gradient(135deg,rgba(232,121,249,.18),rgba(167,139,250,.12));
+  border:1px solid rgba(232,121,249,.35);border-radius:18px;
+  text-align:center;position:relative;
+  box-shadow:0 4px 20px rgba(232,121,249,.15);
+}
+.fragrance-icon{font-size:1.8rem;margin-bottom:6px;line-height:1}
+.fragrance-label{
+  font-size:.78rem;font-weight:700;letter-spacing:4px;
+  color:var(--accent3);text-transform:uppercase;margin-bottom:10px;
+}
+.fragrance-value{
+  font-size:1.15rem;font-weight:600;color:#fff;
+  line-height:1.7;letter-spacing:1.5px;
+}
 /* Charts */
 .charts-row{display:flex;gap:20px;width:100%;flex-wrap:wrap;margin-top:20px}
 .chart-box{flex:1;min-width:280px}
@@ -254,6 +271,11 @@ td{padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.05)}
     <div class="type-badge" id="result-type"></div>
     <div class="type-title" id="result-title"></div>
     <div class="type-desc" id="result-desc"></div>
+    <div class="fragrance-box">
+      <div class="fragrance-icon">🌸</div>
+      <div class="fragrance-label">推薦香調</div>
+      <div class="fragrance-value" id="result-fragrance"></div>
+    </div>
   </div>
   <div class="charts-row" id="result-charts">
     <div class="chart-box card"><h3>🌍 全球分佈</h3><canvas id="chart-global"></canvas><div class="legend-grid" id="legend-global"></div></div>
@@ -350,22 +372,22 @@ const MBTI_TYPES = ['ISTJ','ISFJ','INFJ','INTJ','ISTP','ISFP','INFP','INTP','EST
 const GLOBAL_PCT = {ISTJ:11.6,ISFJ:13.8,INFJ:1.5,INTJ:2.1,ISTP:5.4,ISFP:8.8,INFP:4.4,INTP:3.3,ESTP:4.3,ESFP:8.5,ENFP:8.1,ENTP:3.2,ESTJ:8.7,ESFJ:12.3,ENFJ:2.5,ENTJ:1.8};
 
 const TYPE_INFO = {
-  ISTJ:{title:'檢查者',desc:'負責任、細心、務實。重視傳統與秩序，做事有條理且可靠，是值得信賴的執行者。'},
-  ISFJ:{title:'守護者',desc:'溫暖、體貼、盡責。默默關心他人，記住每個重要細節，用行動表達深厚的愛。'},
-  INFJ:{title:'提倡者',desc:'富有洞察力和理想主義。內心世界豐富，致力於幫助他人實現潛能，追求有意義的人生。'},
-  INTJ:{title:'策略家',desc:'獨立、有遠見、追求卓越。善於制定長期計畫，用創新思維解決複雜問題。'},
-  ISTP:{title:'巧匠',desc:'冷靜、理性、擅長分析。喜歡動手解決問題，在危機中保持鎮定，享受探索事物運作原理。'},
-  ISFP:{title:'探險家',desc:'溫柔、敏感、富有藝術氣質。活在當下，用獨特的美學視角感受世界，珍惜個人自由。'},
-  INFP:{title:'調停者',desc:'理想主義、富同理心、忠於價值觀。內心充滿熱情，追求真實自我，渴望讓世界更美好。'},
-  INTP:{title:'邏輯學家',desc:'好奇、善於分析、追求知識。喜歡探索理論與概念，用邏輯思維理解宇宙的奧秘。'},
-  ESTP:{title:'企業家',desc:'精力充沛、大膽、務實。善於把握當下機會，喜歡冒險和刺激，是天生的問題解決者。'},
-  ESFP:{title:'表演者',desc:'熱情、開朗、活力四射。享受成為焦點，用正能量感染周圍的人，讓生活充滿歡樂。'},
-  ENFP:{title:'競選者',desc:'熱情、創意、樂觀。充滿想像力和感染力，善於發現他人的潛力，追求多彩人生。'},
-  ENTP:{title:'辯論家',desc:'機智、好奇、喜歡挑戰。享受思辯過程，善於從不同角度看問題，是創新的推動者。'},
-  ESTJ:{title:'總經理',desc:'果斷、有組織、負責任。天生的領導者，善於管理和執行，確保事情按計畫進行。'},
-  ESFJ:{title:'執政官',desc:'熱心、合群、樂於助人。重視和諧的人際關係，總是第一個伸出援手，讓每個人感到被關懷。'},
-  ENFJ:{title:'主角',desc:'富有魅力、有同理心、鼓舞人心。天生的領導者，激勵他人成長，致力於創造正面改變。'},
-  ENTJ:{title:'指揮官',desc:'自信、有魄力、高效。戰略思維出眾，善於帶領團隊達成目標，追求卓越不妥協。'}
+  ISTJ:{title:'物流師',desc:'ISTJ 係十分務實同可靠嘅人，對責任有極高嘅承擔感。佢哋做事一絲不苟，重視傳統同既定嘅規則，習慣按計劃進行，唔鍾意臨時變動。喺工作上係出名嘅穩陣派，承諾過嘅事一定做到底。雖然外表冷靜內斂，唔多表達情感，但對家人朋友其實非常忠誠。喺混亂嘅環境入面，ISTJ 就係嗰個默默維持秩序嘅人。',fragrance:'木質調、皮革調'},
+  ISFJ:{title:'守衛者',desc:'ISFJ 係溫柔細膩嘅守護者，永遠記得身邊人嘅小習慣同喜好。佢哋將照顧別人視為一種使命，鍾意默默付出而唔求回報。雖然性格內向，但對重視嘅人會展現出無比嘅耐性同包容。ISFJ 重視傳統同回憶，鍾意製造溫馨嘅氛圍。佢哋容易忽略自己嘅需要，所以更加需要被身邊人珍惜。係朋友圈入面最值得信賴嘅嗰一位。',fragrance:'柔和花香調、粉香調、白麝香調'},
+  INFJ:{title:'提倡者',desc:'INFJ 係 16 型入面最稀有嘅人格，自帶一種神秘氣質。佢哋擁有極強嘅洞察力，可以一眼睇穿人嘅情緒同動機。表面安靜寡言，內心卻有一個豐富而複雜嘅世界。INFJ 係理想主義者，相信自己有使命去改變世界，會為咗信念泠泠努力。佢哋同人相處時溫暖體貼，但同時需要大量獨處嘅時間去整理思緒。深度永遠勝於廣度。',fragrance:'煙燻木質調、神秘香料調、東方調'},
+  INTJ:{title:'建築師',desc:'INTJ 係天生嘅戰略家，思維清晰、邏輯強大，鍾意諗大局唔糾結細節。佢哋追求完美同效率，對自己同他人都有極高嘅標準。INTJ 獨立性強，唔需要太多社交，可以長時間沉浸喺自己嘅思考世界入面。表面冷靜疏離，但其實對重要嘅人非常忠誠。佢哋唔鍾意廢話同無謂嘅情緒化，喜歡有深度嘅對話。係實實在在嘅腦力派。',fragrance:'冷冽木質調、黑胡椒香料調、岩蘭草調'},
+  ISTP:{title:'鑑賞家',desc:'ISTP 係冷靜嘅實踐派，對機械、工具同各種技術有天生嘅觸覺。佢哋鍾意動手解決問題，學嘢快，喺壓力之下反而更加冷靜。ISTP 重視個人自由，討厭被規則同期望束縛，唔鍾意做承諾。表面睇落冷漠寡言，其實只係將注意力放喺事物而非情緒上。佢哋係嗰啲冇出聲就搞掂晒所有嘢嘅人。獨立、酷、有自己嘅節奏。',fragrance:'金屬調、皮革木質調、煙燻調'},
+  ISFP:{title:'冒險家',desc:'ISFP 係藝術氣質濃厚嘅自由靈魂，對美感有極高嘅敏銳度。佢哋活喺當下，重視自己嘅感受多過邏輯分析，鍾意用行動而非言語去表達情感。ISFP 表面隨和友善，但內心其實有非常堅定嘅價值觀，唔會輕易妥協。佢哋鍾意大自然、藝術、音樂，喺日常入面尋找美好嘅瞬間。低調但充滿魅力，似一陣輕風咁悄悄走入人心。',fragrance:'柔美花果調、清新自然調、白麝香調'},
+  INFP:{title:'調停者',desc:'INFP 係浪漫嘅夢想家，內心住住一個充滿故事同幻想嘅世界。佢哋對人有深刻嘅同理心，永遠願意聆聽同理解他人。INFP 重視真誠同個人價值觀，唔鍾意虛偽同表面嘅社交。佢哋鍾意寫作、藝術同任何能夠表達內心嘅創作。表面溫柔靦腆，但對信念非常執著，會為咗自己相信嘅嘢默默堅持。係治癒系靈魂，自帶詩意同溫度。',fragrance:'花香調、香草甜調、無花果調'},
+  INTP:{title:'邏輯學家',desc:'INTP 係天生嘅思想家，對知識同真理有近乎癡迷嘅追求。佢哋鍾意鑽研冷門嘅理論同概念，思維跳躍而精準。INTP 唔受規則束縛，永遠喺問「點解」，會將任何事情拆解到最基本嘅原理。佢哋同人交流時可能顯得抽離，因為腦袋永遠喺諗緊嘢。表面慵懶實際勤奮，只係勤奮喺自己感興趣嘅領域。係古怪而迷人嘅學者型靈魂。',fragrance:'清冷草本調、墨水調、薄荷調'},
+  ESTP:{title:'企業家',desc:'ESTP 係充滿活力嘅行動派，鍾意刺激同冒險，討厭一成不變嘅生活。佢哋反應快、應變能力強，喺社交場合自然係焦點。ESTP 活喺當下，鍾意親身體驗多過長篇大論嘅理論，係嗰啲講做就做嘅人。佢哋觀察力敏銳，識得快速判斷形勢同人心。表面玩世不恭，其實有自己嘅生存智慧。同 ESTP 一齊永遠唔會悶，佢哋係天生嘅氣氛製造機。',fragrance:'辛辣木質調、柑橘調、煙草調'},
+  ESFP:{title:'表演者',desc:'ESFP 係天生嘅表演者，散發住強烈嘅熱情同感染力。佢哋鍾意俾人開心，係 party 嘅靈魂人物，永遠有講唔完嘅故事。ESFP 活喺當下，重視感官享受，鍾意美食、音樂同所有能夠帶來愉悅嘅事物。佢哋情感豐富而真誠，朋友有事一定第一個出現。雖然唔鍾意諗太遠嘅將來，但勝喺將每一日都過得精彩。係令世界變得閃閃發光嘅存在。',fragrance:'甜美果香調、椰子調、焦糖香草調'},
+  ENFP:{title:'競選者',desc:'ENFP 係創意無限嘅自由靈魂，永遠對世界充滿好奇同熱情。佢哋思維跳躍，興趣廣泛，每隔一排就會迷上新嘅嘢。ENFP 善於同人連結，可以喺幾分鐘內同陌生人變成朋友。佢哋追求意義同可能性，討厭被困喺一成不變嘅環境。表面活潑樂觀，內心其實非常敏感深刻。同 ENFP 一齊會被佢哋嘅能量感染，世界喺佢哋眼中永遠有新嘅可能。',fragrance:'鮮明花果調、柑橘調、粉紅胡椒調'},
+  ENTP:{title:'辯論家',desc:'ENTP 係機智嘅思想挑戰者，鍾意推翻常規同提出新諗法。佢哋思維敏捷，口才一流，最享受嘅就係一場精彩嘅辯論。ENTP 對任何嘢都有興趣去拆解同重組，係天生嘅創新者同問題解決者。佢哋唔鍾意例行公事，需要不斷嘅刺激同挑戰。表面玩世不恭實際野心勃勃，會為咗自己感興趣嘅 idea 投入晒所有精力。係腦力同魅力並存嘅人格。',fragrance:'清新草本調、辛香料調、青檸調'},
+  ESTJ:{title:'總經理',desc:'ESTJ 係天生嘅領導者，講求效率、組織同執行力。佢哋鍾意制定規則同流程，將一切安排得井井有條。ESTJ 對承諾同責任有極高嘅標準，做事務實可靠，係團隊入面最穩定嘅核心。佢哋直接坦率，唔鍾意拐彎抹角，可能因此俾人覺得太嚴厲。但 ESTJ 對重視嘅人非常忠誠，會用實際行動去保護同支持身邊嘅人。係值得信賴嘅實幹型領袖。',fragrance:'經典木質調、煙草調、廣藿香調'},
+  ESFJ:{title:'執政官',desc:'ESFJ 係溫暖嘅社交達人，將人際關係視為人生最重要嘅事。佢哋熱心助人，記得每個朋友嘅生日同喜好，係朋友圈入面嘅 organizer。ESFJ 重視和諧同傳統，鍾意製造溫馨嘅氛圍同回憶。佢哋對家人朋友嘅付出毫無保留，但同時亦渴望被認同同欣賞。表面活潑開朗，內心其實非常細膩，會留意身邊每個人嘅情緒。係嗰個將大家凝聚埋一齊嘅暖心人物。',fragrance:'溫暖花香調、香草調、玫瑰茉莉調'},
+  ENFJ:{title:'主人公',desc:'ENFJ 係極具魅力嘅天生領導者，擁有強大嘅感染力同同理心。佢哋識得睇穿人嘅潛能，並且有本事激勵對方變得更好。ENFJ 將幫助他人視為使命，無論喺工作定生活都全情投入。佢哋表達能力一流，可以將複雜嘅諗法講到深入淺出。表面光鮮亮麜，但其實會為咗他人付出過多而忽略自己。係嗰種令成個房間都發光嘅人，自帶光環同溫度。',fragrance:'優雅花香調、木質調、琥珀調'},
+  ENTJ:{title:'指揮官',desc:'ENTJ 係野心勃勃嘅戰略家，天生為咗領導同成就而生。佢哋目標明確、執行力強，可以將最複雜嘅計劃拆解成可行嘅步驟。ENTJ 思維清晰、決斷果敢，唔會喺無謂嘅情緒上浪費時間。佢哋對自己同他人都要求極高，相信努力同能力可以改變一切。表面強勢，其實對重視嘅人非常保護。同 ENTJ 一齊會俾佢哋嘅氣場推住向前行。係天生嘅 king/queen 級人格。',fragrance:'濃烈木質調、皮革調、烏木龍涎香調'}
 };
 
 function typeGroup(t){
@@ -430,8 +452,8 @@ const QUESTIONS = [
   {dim:'JP',text:'對於計畫，你傾向：',a:'提前制定並按計畫執行',b:'保持彈性，看情況再決定'},
   {dim:'JP',text:'截止日期對你來說：',a:'是重要的，我會提前完成',b:'是參考值，常常在最後才趕完'},
   {dim:'JP',text:'你更喜歡的生活方式是：',a:'有規律、可預測的',b:'自由、充滿驚喜的'},
-  {dim:'JP',text:'做作業時你通常：',a:'早早開始，分段完成',b:'接近截止日才開始但也能完成'},
-  {dim:'JP',text:'你偏好的工作環境是：',a:'有明確的規則和流程',b:'靈活開放，可以自由發揮'},
+  {dim:'JP',text:'做作業時你通常：',a:'早f��i��始，分段完成',b:'接近截止日才開始但也能完成'},
+  {dim:'JP',text:'你倏好的工作環境是：',a:'有明確的規則和流程',b:'靈活開放，可以自由發揮'},
   {dim:'JP',text:'買東西時你通常：',a:'事先列好清單，按清單購買',b:'隨興逛逛，看到喜歡的就買'},
   {dim:'JP',text:'你對「改變計畫」的感覺是：',a:'不太喜歡，會感到不安',b:'沒關係，甚至覺得更有趣'},
   {dim:'JP',text:'你更常：',a:'先做完事情再放鬆',b:'先享受再說，事情之後會完成'},
@@ -583,9 +605,10 @@ async function submitTest() {
 /* ==================== RESULT ==================== */
 async function showResult(type) {
   document.getElementById('result-type').textContent = type;
-  const info = TYPE_INFO[type] || {title:'',desc:''};
+  const info = TYPE_INFO[type] || {title:'',desc:'',fragrance:''};
   document.getElementById('result-title').textContent = info.title;
   document.getElementById('result-desc').textContent = info.desc;
+  document.getElementById('result-fragrance').textContent = info.fragrance || '';
   showScreen('result');
 
   // Fetch class results
